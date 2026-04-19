@@ -1,3 +1,5 @@
+import { addMailJob } from "../../infrastructure/queues/mail.queue.js";
+
 export class RegisterUser {
   constructor(userRepository, passwordService, mailService) {
     this.userRepository = userRepository;
@@ -28,7 +30,11 @@ export class RegisterUser {
     });
 
     // 4. Communication: Send Email
-    await this.mailService.sendVerificationEmail(email, verificationToken);
+    await addMailJob({
+      email: newUser.email,
+      name: newUser.name,
+      token: verificationToken
+    });
 
     return newUser;
   }

@@ -17,6 +17,10 @@ app.use(cors());
 app.use(morgan("dev"));
 app.use(express.json());
 
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'UP', timestamp: new Date() });
+});
+
 // Routes
 app.post("/api/v1/auth/register", userController.register);
 
