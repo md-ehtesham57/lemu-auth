@@ -1,5 +1,6 @@
 import "./src/config.js";
-
+import { validate } from "./src/infrastructure/middleware/validate.js";
+import { registerSchema } from "./src/infrastructure/validation/auth.schema.js";
 
 import express from "express";
 import helmet from "helmet";
@@ -22,7 +23,7 @@ app.get('/health', (req, res) => {
 });
 
 // Routes
-app.post("/api/v1/auth/register", userController.register);
+app.post("/api/v1/auth/register", validate(registerSchema), userController.register);
 
 // Global Error Handler
 app.use(errorMiddleware);

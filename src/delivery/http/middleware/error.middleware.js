@@ -1,9 +1,18 @@
+import { ZodError } from 'zod';
+
 export const errorMiddleware = (err, req, res, next) => {
   console.error(`[Error]: ${err.message}`);
 
-  // Handle Zod Validation Errors
-  if (err.name === "ZodError") {
-    return res.status(400).json({ success: false, errors: err.errors });
+  // ✅ More robust check for Zod Errors
+  if (err instanceof ZodError) {
+    return res.status(400).json({
+      success: false,
+      message: "Validation Failed",
+      errors: err.errors.map(e => ({
+        field: e.path.join('.'),
+        message: e.message
+      }))
+    });
   }
 
   // Handle Business Logic Errors
@@ -12,5 +21,8 @@ export const errorMiddleware = (err, req, res, next) => {
   }
 
   // Default Server Error
-  res.status(500).json({ success: false, message: "Internal Server Error" });
+  res.status(500).json({ 
+    success: false, 
+    message: process.env.NODE_ENV === 'development' ? err.message : "Internal Server Error" 
+  });
 };

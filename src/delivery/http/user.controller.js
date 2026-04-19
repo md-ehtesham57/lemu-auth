@@ -1,5 +1,3 @@
-import { registerSchema } from "../../shared/schemas/authSchema.js";
-
 export class UserController {
   constructor(registerUserUseCase) {
     this.registerUserUseCase = registerUserUseCase;
@@ -7,21 +5,19 @@ export class UserController {
 
   register = async (req, res, next) => {
     try {
-      // ✅ 1. Validate Input (Fast fail)
-      const validatedData = registerSchema.parse(req.body);
+      // 🛡️ No need to parse again! The middleware already did this.
+      // req.body is already validated by the time it gets here.
+      
+      const user = await this.registerUserUseCase.execute(req.body);
 
-      // ✅ 2. Execute Use Case
-      const user = await this.registerUserUseCase.execute(validatedData);
-
-      // ✅ 3. Send Response
       return res.status(201).json({
         success: true,
         message: "User registered successfully. Please verify your email.",
         data: { id: user._id, email: user.email }
       });
     } catch (error) {
-      // Pass to global error handler
-      next(error);
+      // If the Use Case fails (e.g., User already exists), this catches it.
+      next(error); 
     }
   };
 }
