@@ -1,35 +1,38 @@
+import crypto from "crypto";
 import { addMailJob } from "../../infrastructure/queues/mail.queue.js";
 
 export class RegisterUser {
-  constructor(userRepository, passwordService, mailService) {
+  constructor(userRepository, passwordService) {
     this.userRepository = userRepository;
     this.passwordService = passwordService;
-    this.mailService = mailService;
   }
 
   async execute(userData) {
     const { name, email, password } = userData;
 
-    // 1. Business Logic: Check if user exists
+    // 1. Check if user already exists
     const existingUser = await this.userRepository.findByEmail(email);
     if (existingUser) {
       throw new Error("USER_ALREADY_EXISTS");
     }
 
-    // 2. Data Preparation: Hash password & create token
+    // 2. Hash Password using bcryptjs via our service
     const hashedPassword = await this.passwordService.hash(password);
-    const verificationToken = Math.random().toString(36).substring(2); // Simple token for now
+    
+    // 3. Generate Secure Token using crypto
+    // Generates a 32-character hex string (e.g., 'f1e2d3...')
+    const verificationToken = crypto.randomBytes(32).toString('hex');
 
-    // 3. Persistence: Save to DB
+    // 4. Persistence
     const newUser = await this.userRepository.save({
       name,
       email,
       password: hashedPassword,
       verificationToken,
-      verificationTokenExpires: Date.now() + 3600000, // 1 hour
+      verificationTokenExpires: Date.now() + 3600000, // 1 hour expiry
     });
 
-    // 4. Communication: Send Email
+    // 5. Background Task (Redis Queue)
     await addMailJob({
       email: newUser.email,
       name: newUser.name,
