@@ -1,12 +1,11 @@
 export class UserController {
-  constructor(registerUserUseCase) {
+  constructor(registerUserUseCase, loginUserUseCase) {
     this.registerUserUseCase = registerUserUseCase;
+    this.loginUserUseCase = loginUserUseCase;
   }
 
   register = async (req, res, next) => {
     try {
-      // 🛡️ No need to parse again! The middleware already did this.
-      // req.body is already validated by the time it gets here.
       
       const user = await this.registerUserUseCase.execute(req.body);
 
@@ -20,4 +19,41 @@ export class UserController {
       next(error); 
     }
   };
+
+  // --- LOGIN ---
+  login = async (req, res, next) => {
+    try {
+      // Execute Use Case logic
+      const user = await this.loginUserUseCase.execute(req.body);
+
+      const token = this._generateToken(user.id);
+
+      // Set Secure Cookie
+      res.cookie("token", token, {
+        httpOnly: true, // Prevents JS access
+        secure: process.env.NODE_ENV === "production", // Only HTTPS in prod
+        sameSite: "strict", // CSRF protection
+        maxAge: 24 * 60 * 60 * 1000, // 1 day
+      });
+
+      return res.status(200).json({
+        success: true,
+        message: "Login successful.",
+        data: {
+          user: {
+            id: user.id,
+            name: user.name,
+            email: user.email
+          }
+        }
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  // Internal helper for JWT
+  _generateToken(userId) {
+    return "dummy-token-for-now"; 
+  }
 }

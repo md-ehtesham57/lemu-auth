@@ -10,35 +10,44 @@ export class RegisterUser {
   async execute(userData) {
     const { name, email, password } = userData;
 
-    // 1. Check if user already exists
+    // Check existence BEFORE hashing to save expensive CPU cycles.
     const existingUser = await this.userRepository.findByEmail(email);
     if (existingUser) {
       throw new Error("USER_ALREADY_EXISTS");
     }
 
-    // 2. Hash Password using bcryptjs via our service
-    const hashedPassword = await this.passwordService.hash(password);
-    
-    // 3. Generate Secure Token using crypto
-    // Generates a 32-character hex string (e.g., 'f1e2d3...')
-    const verificationToken = crypto.randomBytes(32).toString('hex');
+    // Hashing is CPU-bound; crypto is fast.
+    const [hashedPassword, verificationToken] = await Promise.all([
+      this.passwordService.hash(password),
+      Promise.resolve(crypto.randomBytes(32).toString('hex'))
+    ]);
 
-    // 4. Persistence
+    // Ensure your Repository/Model has a unique index on 'email' as a final safety net.
     const newUser = await this.userRepository.save({
       name,
       email,
       password: hashedPassword,
       verificationToken,
-      verificationTokenExpires: Date.now() + 3600000, // 1 hour expiry
+      verificationTokenExpires: Date.now() + 3600000, 
     });
 
-    // 5. Background Task (Redis Queue)
-    await addMailJob({
-      email: newUser.email,
+    // We wrap the queue call so a Redis hiccup doesn't crash the whole registration.
+    try {
+      await addMailJob({
+        email: newUser.email,
+        name: newUser.name,
+        token: verificationToken
+      });
+    } catch (error) {
+      console.error("Failed to queue email job:", error.message);
+    }
+
+    // Never return the hashed password or the verification token to the client.
+    return {
+      id: newUser._id,
       name: newUser.name,
-      token: verificationToken
-    });
-
-    return newUser;
+      email: newUser.email,
+      isVerified: false
+    };
   }
 }

@@ -1,6 +1,6 @@
 import "./src/config.js";
 import { validate } from "./src/infrastructure/middleware/validate.js";
-import { registerSchema } from "./src/infrastructure/validation/auth.schema.js";
+import { registerSchema, loginSchema } from "./src/infrastructure/validation/auth.schema.js";
 
 import express from "express";
 import helmet from "helmet";
@@ -9,6 +9,7 @@ import morgan from "morgan";
 import { connectDB } from "./src/infrastructure/db/mongoose.js";
 import { userController } from "./src/delivery/http/container.js";
 import { errorMiddleware } from "./src/delivery/http/middleware/error.middleware.js";
+import { UserController } from "./src/delivery/http/user.controller.js";
 
 const app = express();
 
@@ -17,6 +18,7 @@ app.use(helmet()); // Security headers
 app.use(cors());
 app.use(morgan("dev"));
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'UP', timestamp: new Date() });
@@ -24,6 +26,8 @@ app.get('/health', (req, res) => {
 
 // Routes
 app.post("/api/v1/auth/register", validate(registerSchema), userController.register);
+
+app.post("/api/v1/auth/login", validate(loginSchema), userController.login)
 
 // Global Error Handler
 app.use(errorMiddleware);

@@ -16,3 +16,16 @@ export const registerSchema = z.object({
     .regex(/[0-9]/, "Password must contain at least one number")
     .regex(/[^A-Za-z0-9]/, "Password must contain at least one special character")
 });
+
+export const loginSchema = z.object({
+  body: z.object({
+    email: z
+      .string({ required_error: "Email is required" })
+      .trim()
+      .toLowerCase()
+      .email("Invalid email format"),
+    password: z
+      .string({ required_error: "Password is required" })
+      .min(1, "Password cannot be empty"),
+  }),
+});
