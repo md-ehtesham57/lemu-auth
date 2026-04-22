@@ -5,4 +5,4 @@ import { validate } from '../middleware/validate.js';
 
 router.post('/register', validate(registerSchema), authController.register);
 
-router.post('/login', validate(loginSchema), authController.login);
+router.post('/login', validate(loginSchema), (req, res, next) => authController.login(req, res, next));
