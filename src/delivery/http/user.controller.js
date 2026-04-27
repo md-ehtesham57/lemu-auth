@@ -2,11 +2,12 @@ export class UserController {
   constructor(registerUserUseCase, loginUserUseCase) {
     this.registerUserUseCase = registerUserUseCase;
     this.loginUserUseCase = loginUserUseCase;
+    this.forgotPasswordUseCase = forgotPasswordUseCase;
   }
 
   register = async (req, res, next) => {
     try {
-      
+
       const user = await this.registerUserUseCase.execute(req.body);
 
       return res.status(201).json({
@@ -16,7 +17,7 @@ export class UserController {
       });
     } catch (error) {
       // If the Use Case fails (e.g., User already exists), this catches it.
-      next(error); 
+      next(error);
     }
   };
 
@@ -54,6 +55,26 @@ export class UserController {
 
   // Internal helper for JWT
   _generateToken(userId) {
-    return "dummy-token-for-now"; 
+    return "dummy-token-for-now: hfkds20i4ngkj30u6kiu43";
+  }
+
+  forgotPassword = async (req, res, next) => {
+    try {
+      const { email } = req.body;
+
+      // Ensure 'this.' is present here!
+      const result = await this.forgotPasswordUseCase.execute(email);
+
+      res.status(200).json({
+        success: true,
+        message: result.message
+      });
+    } catch (error) {
+      next(error); // Sends error to your errorMiddleware
+    }
+  };
+
+  _generateToken(userId) {
+    return "dummy-token-for-now: kfhdsj204nvkds04i0fkns"
   }
 }
