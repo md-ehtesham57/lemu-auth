@@ -1,5 +1,5 @@
 export class UserController {
-  constructor(registerUserUseCase, loginUserUseCase) {
+  constructor(registerUserUseCase, loginUserUseCase, forgotPasswordUseCase) {
     this.registerUserUseCase = registerUserUseCase;
     this.loginUserUseCase = loginUserUseCase;
     this.forgotPasswordUseCase = forgotPasswordUseCase;

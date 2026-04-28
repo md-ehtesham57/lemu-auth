@@ -27,4 +27,22 @@ export class MailService {
       text: `Click here: ${url}`,
     });
   }
+
+async sendPasswordReset(email, token) {
+    try {
+      // For testing, we generate the link that will eventually point to your Frontend
+      const resetLink = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/reset-password?token=${token}`;
+      
+      console.log("-----------------------------------------");
+      console.log(`📧 Sending Reset Email to: ${email}`);
+      console.log(`🔗 Link: ${resetLink}`);
+      console.log("-----------------------------------------");
+
+      // Later, you will add your Nodemailer/SendGrid logic here
+      return true;
+    } catch (error) {
+      console.error("MailService Error:", error);
+      throw new Error("ERR_EMAIL_SEND_FAILED");
+    }
+  }
 }

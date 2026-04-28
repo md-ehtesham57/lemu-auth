@@ -1,6 +1,6 @@
 import "./src/config.js";
 import { validate } from "./src/infrastructure/middleware/validate.js";
-import { registerSchema, loginSchema } from "./src/infrastructure/validation/auth.schema.js";
+import { registerSchema, loginSchema, forgotPasswordSchema } from "./src/infrastructure/validation/auth.schema.js";
 
 import express from "express";
 import helmet from "helmet";
@@ -28,6 +28,8 @@ app.get('/health', (req, res) => {
 app.post("/api/v1/auth/register", validate(registerSchema), userController.register);
 
 app.post("/api/v1/auth/login", validate(loginSchema), userController.login)
+
+app.post("/api/v1/auth/forgot-password", validate(forgotPasswordSchema), userController.forgotPassword)
 
 // Global Error Handler
 app.use(errorMiddleware);

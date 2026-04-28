@@ -7,6 +7,14 @@ const userSchema = new mongoose.Schema({
   isVerified: { type: Boolean, default: false },
   verificationToken: String,
   verificationTokenExpires: Date,
+
+  passwordResetToken: {
+    type: String,
+    index: true
+  },
+  passwordResetExpires: {
+    type: Date
+  },
 }, { timestamps: true });
 
 // Pre-optimization: This ensures we don't re-compile the model if it exists

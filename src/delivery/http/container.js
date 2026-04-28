@@ -19,4 +19,4 @@ const loginUserUseCase = new LoginUser(userRepo, passwordService);
 const forgotPasswordUseCase = new ForgotPassword(userRepo, mailService);
 
 // 3. Instantiate Controller with Use Case
-export const userController = new UserController(registerUserUseCase, loginUserUseCase);
+export const userController = new UserController(registerUserUseCase, loginUserUseCase, forgotPasswordUseCase);
