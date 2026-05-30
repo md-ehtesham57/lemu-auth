@@ -1,0 +1,25 @@
+import crypto from "crypto";
+
+export class ResetPassword {
+  constructor(userRepository, passwordService) {
+    this.userRepository = userRepository;
+    this.passwordService = passwordService;
+  }
+
+  async execute(token, password) {
+    const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+
+    const user = await this.userRepository.findByResetToken(hashedToken);
+
+    if (!user) {
+      throw new Error("INVALID_OR_EXPIRED_RESET_TOKEN");
+    }
+
+    const hashedPassword = await this.passwordService.hash(password);
+
+    await this.userRepository.updatePassword(user._id, hashedPassword);
+    await this.userRepository.clearResetToken(user._id);
+
+    return { message: "Password reset successful" };
+  }
+}

@@ -17,10 +17,8 @@ export class RegisterUser {
     }
 
     // Hashing is CPU-bound; crypto is fast.
-    const [hashedPassword, verificationToken] = await Promise.all([
-      this.passwordService.hash(password),
-      Promise.resolve(crypto.randomBytes(32).toString('hex'))
-    ]);
+    const hashedPassword = await this.passwordService.hash(password);
+    const verificationToken = crypto.randomBytes(32).toString("hex");
 
     // Ensure your Repository/Model has a unique index on 'email' as a final safety net.
     const newUser = await this.userRepository.save({
