@@ -17,12 +17,13 @@ export class MailService {
       console.log(`[MOCK EMAIL] to: ${email} | Name: ${name} | Token: ${token}`);
       return true;
     }
-    const url = `${process.env.BASE_URL || "http://localhost:5000"}/api/v1/auth/verify-email`;
+    const url = `${process.env.FRONTEND_URL || "http://localhost:3000"}/verify-email?token=${token}`;
     return await this.transporter.sendMail({
       from: '"Auth System" <no-reply@auth.com>',
       to: email,
       subject: "Verify Account",
-      text: `Hello ${name},\n\nPlease verify your account by clicking: ${url}\n\nYour verification token: ${token}`,
+      text: `Hello ${name},\n\nPlease verify your account by clicking: ${url}`,
+      html: `<p>Hello ${name},</p><p>Please verify your account by clicking the link below:</p><p><a href="${url}">Verify Account</a></p>`,
     });
   }
 

@@ -14,7 +14,7 @@ const mailService = new MailService();
 
 const registerUserUseCase = new RegisterUser(userRepo, passwordService);
 const loginUserUseCase = new LoginUser(userRepo, passwordService);
-const forgotPasswordUseCase = new ForgotPassword(userRepo, mailService);
+const forgotPasswordUseCase = new ForgotPassword(userRepo);
 const verifyEmailUseCase = new VerifyEmail(userRepo);
 const resetPasswordUseCase = new ResetPassword(userRepo, passwordService);
 

@@ -48,7 +48,13 @@ describe("RegisterUser", () => {
     expect(result.id).toBe("user-id");
     expect(result.email).toBe("test@example.com");
     expect(result).not.toHaveProperty("password");
-    expect(mockAddMailJob).toHaveBeenCalled();
+    expect(mockAddMailJob).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "verification",
+        email: "test@example.com",
+        token: expect.any(String)
+      })
+    );
   });
 
   it("should throw if user already exists", async () => {

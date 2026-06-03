@@ -1,5 +1,14 @@
 import { jest } from "@jest/globals";
 
+const mockAddMailJob = jest.fn();
+
+jest.unstable_mockModule(
+  "../../../src/infrastructure/queues/mail.queue.js",
+  () => ({
+    addMailJob: mockAddMailJob,
+  })
+);
+
 const { ForgotPassword } = await import(
   "../../../src/core/use-cases/ForgotPassword.js"
 );
@@ -7,20 +16,17 @@ const { ForgotPassword } = await import(
 describe("ForgotPassword", () => {
   let forgotPassword;
   let mockUserRepo;
-  let mockMailService;
 
   beforeEach(() => {
     mockUserRepo = {
       findByEmail: jest.fn(),
       updateResetToken: jest.fn(),
     };
-    mockMailService = {
-      sendPasswordReset: jest.fn(),
-    };
-    forgotPassword = new ForgotPassword(mockUserRepo, mockMailService);
+    forgotPassword = new ForgotPassword(mockUserRepo);
+    mockAddMailJob.mockClear();
   });
 
-  it("should send reset link for existing user", async () => {
+  it("should queue reset link for existing user", async () => {
     mockUserRepo.findByEmail.mockResolvedValue({
       _id: "user-id",
       email: "test@example.com",
@@ -35,9 +41,12 @@ describe("ForgotPassword", () => {
       expect.any(String),
       expect.any(Number)
     );
-    expect(mockMailService.sendPasswordReset).toHaveBeenCalledWith(
-      "test@example.com",
-      expect.any(String)
+    expect(mockAddMailJob).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "password-reset",
+        email: "test@example.com",
+        token: expect.any(String)
+      })
     );
   });
 
@@ -48,6 +57,6 @@ describe("ForgotPassword", () => {
 
     expect(result.message).toContain("reset link has been sent");
     expect(mockUserRepo.updateResetToken).not.toHaveBeenCalled();
-    expect(mockMailService.sendPasswordReset).not.toHaveBeenCalled();
+    expect(mockAddMailJob).not.toHaveBeenCalled();
   });
 });

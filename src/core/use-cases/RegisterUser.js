@@ -19,22 +19,24 @@ export class RegisterUser {
     // Hashing is CPU-bound; crypto is fast.
     const hashedPassword = await this.passwordService.hash(password);
     const verificationToken = crypto.randomBytes(32).toString("hex");
+    const hashedVerificationToken = crypto.createHash("sha256").update(verificationToken).digest("hex");
 
     // Ensure your Repository/Model has a unique index on 'email' as a final safety net.
     const newUser = await this.userRepository.save({
       name,
       email,
       password: hashedPassword,
-      verificationToken,
+      verificationToken: hashedVerificationToken,
       verificationTokenExpires: Date.now() + 3600000, 
     });
 
     // We wrap the queue call so a Redis hiccup doesn't crash the whole registration.
     try {
       await addMailJob({
+        type: "verification",
         email: newUser.email,
         name: newUser.name,
-        token: verificationToken
+        token: verificationToken // Send the raw token to the user
       });
     } catch (error) {
       console.error("Failed to queue email job:", error.message);
