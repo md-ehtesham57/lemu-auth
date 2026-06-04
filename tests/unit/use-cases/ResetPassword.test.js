@@ -12,8 +12,7 @@ describe("ResetPassword", () => {
   beforeEach(() => {
     mockUserRepo = {
       findByResetToken: jest.fn(),
-      updatePassword: jest.fn(),
-      clearResetToken: jest.fn(),
+      resetPassword: jest.fn(),
     };
     mockPasswordService = {
       hash: jest.fn(),
@@ -25,17 +24,17 @@ describe("ResetPassword", () => {
     mockUserRepo.findByResetToken.mockResolvedValue({
       _id: "user-id",
       email: "test@example.com",
+      passwordResetExpires: Date.now() + 3600000,
     });
     mockPasswordService.hash.mockResolvedValue("new-hashed-password");
 
     const result = await resetPassword.execute("valid-token", "NewPassword123!");
 
     expect(result.message).toBe("Password reset successful");
-    expect(mockUserRepo.updatePassword).toHaveBeenCalledWith(
+    expect(mockUserRepo.resetPassword).toHaveBeenCalledWith(
       "user-id",
       "new-hashed-password"
     );
-    expect(mockUserRepo.clearResetToken).toHaveBeenCalledWith("user-id");
   });
 
   it("should throw for invalid or expired token", async () => {

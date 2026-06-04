@@ -20,6 +20,7 @@ describe("VerifyEmail", () => {
     mockUserRepo.findByVerificationToken.mockResolvedValue({
       _id: "user-id",
       email: "test@example.com",
+      verificationTokenExpires: Date.now() + 3600000,
     });
 
     const result = await verifyEmail.execute("valid-token");

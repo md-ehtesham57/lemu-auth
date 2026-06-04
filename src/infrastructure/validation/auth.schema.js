@@ -2,7 +2,12 @@ import { z } from "zod";
 
 export const registerSchema = z.object({
   body: z.object({
-    name: z.string().min(2, "Name must be at least 2 characters").max(50, "Name is too long"),
+    name: z
+      .string()
+      .min(2, "Name must be at least 2 characters")
+      .max(50, "Name is too long")
+      .regex(/^[a-zA-Z0-9\s\-'._]+$/, "Name contains invalid characters")
+      .trim(),
 
     email: z.string().email("Invalid email format").trim().toLowerCase(),
 
@@ -41,7 +46,8 @@ export const verifyEmailSchema = z.object({
   body: z.object({
     token: z
       .string({ required_error: "Verification token is required" })
-      .min(1, "Token cannot be empty"),
+      .min(1, "Token cannot be empty")
+      .max(128, "Token is malformed"),
   }),
 });
 
@@ -49,7 +55,8 @@ export const resetPasswordSchema = z.object({
   body: z.object({
     token: z
       .string({ required_error: "Reset token is required" })
-      .min(1, "Token cannot be empty"),
+      .min(1, "Token cannot be empty")
+      .max(128, "Token is malformed"),
     password: z
       .string()
       .min(8, "Password must be at least 8 characters")

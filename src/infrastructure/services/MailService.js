@@ -14,7 +14,7 @@ export class MailService {
 
   async sendVerificationEmail(email, name, token) {
     if (!process.env.MAIL_USER || process.env.MAIL_USER === "your_user") {
-      console.log(`[MOCK EMAIL] to: ${email} | Name: ${name} | Token: ${token}`);
+      console.log(`[MOCK EMAIL] to: ${email} | Name: ${name} | Token: ...${token.slice(-6)}`);
       return true;
     }
     const url = `${process.env.FRONTEND_URL || "http://localhost:3000"}/verify-email?token=${token}`;
@@ -31,12 +31,12 @@ export class MailService {
     const resetLink = `${process.env.FRONTEND_URL || "http://localhost:3000"}/reset-password?token=${token}`;
 
     console.log("-----------------------------------------");
-    console.log(`📧 Sending Reset Email to: ${email}`);
-    console.log(`🔗 Link: ${resetLink}`);
+    console.log(`Sending Reset Email to: ${email}`);
+    console.log(`Link suffix: ...${token.slice(-6)}`);
     console.log("-----------------------------------------");
 
     if (!process.env.MAIL_USER || process.env.MAIL_USER === "your_user") {
-      console.log(`[MOCK EMAIL] Password reset to: ${email} | Token: ${token}`);
+      console.log(`[MOCK EMAIL] Password reset to: ${email} | Token: ...${token.slice(-6)}`);
       return true;
     }
 

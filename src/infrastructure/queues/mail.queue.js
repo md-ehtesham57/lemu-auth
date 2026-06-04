@@ -1,10 +1,11 @@
 import { Queue } from 'bullmq';
 import { env } from '../../config.js';
 
-// Connection to our Redis engine
 const connection = {
   host: env.REDIS_HOST || '127.0.0.1',
-  port: env.REDIS_PORT || 6379
+  port: Number(env.REDIS_PORT) || 6379,
+  password: env.REDIS_PASSWORD || undefined,
+  tls: env.REDIS_TLS === 'true' ? {} : undefined,
 };
 
 export const mailQueue = new Queue('mail-queue', { connection });

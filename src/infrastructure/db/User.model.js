@@ -15,6 +15,9 @@ const userSchema = new mongoose.Schema({
   passwordResetExpires: {
     type: Date
   },
+
+  loginAttempts: { type: Number, default: 0 },
+  lockUntil: { type: Date, default: null },
 }, { timestamps: true });
 
 // Pre-optimization: This ensures we don't re-compile the model if it exists

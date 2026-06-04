@@ -12,6 +12,8 @@ describe("LoginUser", () => {
   beforeEach(() => {
     mockUserRepo = {
       findByEmail: jest.fn(),
+      incrementLoginAttempts: jest.fn(),
+      resetLoginAttempts: jest.fn(),
     };
     mockPasswordService = {
       compare: jest.fn(),
@@ -26,6 +28,7 @@ describe("LoginUser", () => {
       email: "test@example.com",
       password: "hashed-password",
       isVerified: true,
+      lockUntil: null,
     };
     mockUserRepo.findByEmail.mockResolvedValue(mockUser);
     mockPasswordService.compare.mockResolvedValue(true);
@@ -58,6 +61,7 @@ describe("LoginUser", () => {
       _id: "user-id",
       email: "test@example.com",
       password: "hashed-password",
+      lockUntil: null,
     });
     mockPasswordService.compare.mockResolvedValue(false);
 
@@ -76,6 +80,7 @@ describe("LoginUser", () => {
       email: "test@example.com",
       password: "hashed-password",
       isVerified: false,
+      lockUntil: null,
     };
     mockUserRepo.findByEmail.mockResolvedValue(mockUser);
     mockPasswordService.compare.mockResolvedValue(true);

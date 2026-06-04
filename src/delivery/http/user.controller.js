@@ -1,4 +1,6 @@
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
+import { tokenBlacklist } from "../../infrastructure/services/TokenBlacklistService.js";
 
 export class UserController {
   constructor(
@@ -15,8 +17,12 @@ export class UserController {
     this.resetPasswordUseCase = resetPasswordUseCase;
   }
 
-  _generateToken(userId) {
-    return jwt.sign({ id: userId }, process.env.JWT_SECRET, { expiresIn: "1d" });
+  _generateToken(user) {
+    return jwt.sign(
+      { id: user.id, email: user.email, name: user.name, jti: crypto.randomUUID() },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" }
+    );
   }
 
   register = async (req, res, next) => {
@@ -37,7 +43,7 @@ export class UserController {
     try {
       const user = await this.loginUserUseCase.execute(req.body);
 
-      const token = this._generateToken(user.id);
+      const token = this._generateToken(user);
 
       res.cookie("token", token, {
         httpOnly: true,
@@ -46,7 +52,7 @@ export class UserController {
         maxAge: 24 * 60 * 60 * 1000,
       });
 
-      return res.status(200).json({
+      const responseData = {
         success: true,
         message: "Login successful.",
         data: {
@@ -56,7 +62,13 @@ export class UserController {
             email: user.email,
           },
         },
-      });
+      };
+
+      if (req.isApiRequest) {
+        responseData.data.token = token;
+      }
+
+      return res.status(200).json(responseData);
     } catch (error) {
       next(error);
     }
@@ -106,10 +118,23 @@ export class UserController {
 
   logout = async (req, res, next) => {
     try {
+      const token = req.cookies?.token;
+      if (token) {
+        try {
+          const decoded = jwt.verify(token, process.env.JWT_SECRET);
+          if (decoded.jti) {
+            await tokenBlacklist.add(decoded.jti, 86400);
+          }
+        } catch {
+          // Token already invalid; proceed with clearing cookie
+        }
+      }
+
       res.clearCookie("token", {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "strict",
+        maxAge: 0,
       });
 
       return res.status(200).json({

@@ -13,6 +13,10 @@ export class VerifyEmail {
       throw new Error("INVALID_OR_EXPIRED_VERIFICATION_TOKEN");
     }
 
+    if (user.verificationTokenExpires && user.verificationTokenExpires < Date.now()) {
+      throw new Error("INVALID_OR_EXPIRED_VERIFICATION_TOKEN");
+    }
+
     await this.userRepository.verifyEmail(user._id);
 
     return { message: "Email verified successfully" };

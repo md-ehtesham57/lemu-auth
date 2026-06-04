@@ -7,8 +7,8 @@ export const errorMiddleware = (err, req, res, next) => {
     return res.status(400).json({
       success: false,
       message: "Validation Failed",
-      errors: err.errors.map((e) => ({
-        field: e.path.join("."),
+      errors: err.issues.map((e) => ({
+        field: e.path[0] === "body" ? e.path.slice(1).join(".") : e.path.join("."),
         message: e.message,
       })),
     });
@@ -28,6 +28,10 @@ export const errorMiddleware = (err, req, res, next) => {
     INVALID_OR_EXPIRED_RESET_TOKEN: {
       status: 400,
       message: "Invalid or expired reset token",
+    },
+    ACCOUNT_LOCKED: {
+      status: 423,
+      message: "Account temporarily locked due to too many failed attempts. Try again later.",
     },
     ERR_EMAIL_SEND_FAILED: {
       status: 500,

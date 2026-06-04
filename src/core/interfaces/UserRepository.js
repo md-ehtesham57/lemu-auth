@@ -17,10 +17,13 @@ export class UserRepository {
   async updateResetToken(userId, token, expires) {
     throw new Error("Method not implemented");
   }
-  async updatePassword(userId, password) {
+  async resetPassword(userId, password) {
     throw new Error("Method not implemented");
   }
-  async clearResetToken(userId) {
+  async incrementLoginAttempts(userId) {
+    throw new Error("Method not implemented");
+  }
+  async resetLoginAttempts(userId) {
     throw new Error("Method not implemented");
   }
 }

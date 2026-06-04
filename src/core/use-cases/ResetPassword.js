@@ -15,10 +15,13 @@ export class ResetPassword {
       throw new Error("INVALID_OR_EXPIRED_RESET_TOKEN");
     }
 
+    if (user.passwordResetExpires && user.passwordResetExpires < Date.now()) {
+      throw new Error("INVALID_OR_EXPIRED_RESET_TOKEN");
+    }
+
     const hashedPassword = await this.passwordService.hash(password);
 
-    await this.userRepository.updatePassword(user._id, hashedPassword);
-    await this.userRepository.clearResetToken(user._id);
+    await this.userRepository.resetPassword(user._id, hashedPassword);
 
     return { message: "Password reset successful" };
   }
