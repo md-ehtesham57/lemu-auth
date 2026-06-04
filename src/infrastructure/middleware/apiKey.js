@@ -3,10 +3,9 @@ export const apiKeyAuth = (req, res, next) => {
   if (!apiKey) return next();
 
   const providedKey = req.headers["x-api-key"];
-  if (!providedKey || providedKey !== apiKey) {
-    return res.status(401).json({ success: false, message: "Invalid or missing API key" });
+  if (providedKey && providedKey === apiKey) {
+    req.isApiRequest = true;
   }
 
-  req.isApiRequest = true;
   next();
 };

@@ -7,7 +7,7 @@ const redis = new Redis({
   password: env.REDIS_PASSWORD || undefined,
   tls: env.REDIS_TLS === "true" ? {} : undefined,
   maxRetriesPerRequest: null,
-  lazyConnect: true,
+  enableReadyCheck: false,
 });
 
 redis.on("error", (err) => {

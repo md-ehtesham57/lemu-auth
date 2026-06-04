@@ -82,14 +82,15 @@ app.use(express.urlencoded({ extended: true, limit: "10kb" }));
 // Global rate limiting
 app.use(globalLimiter);
 
-// API key check for service-to-service requests
-app.use(apiKeyAuth);
-
-// --- Routes ---
+// Health endpoint: must be before apiKeyAuth so health checks don't need the key
 app.get("/health", (req, res) => {
   res.status(200).json({ status: "UP" });
 });
 
+// API key check for service-to-service requests
+app.use(apiKeyAuth);
+
+// --- Routes ---
 app.use("/api/v1/auth", authLimiter);
 app.post("/api/v1/auth/register", validate(registerSchema), userController.register);
 app.post("/api/v1/auth/login", validate(loginSchema), userController.login);
