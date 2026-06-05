@@ -45,9 +45,9 @@ export const forgotPasswordSchema = z.object({
 export const verifyEmailSchema = z.object({
   body: z.object({
     token: z
-      .string({ required_error: "Verification token is required" })
-      .min(1, "Token cannot be empty")
-      .max(128, "Token is malformed"),
+      .string({ required_error: "Verification code is required" })
+      .length(6, "Code must be exactly 6 digits")
+      .regex(/^\d{6}$/, "Code must be 6 digits"),
   }),
 });
 

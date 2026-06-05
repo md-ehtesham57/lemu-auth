@@ -24,7 +24,7 @@
     "mongodb": "^7.1.1",
     "mongoose": "^9.4.1",
     "morgan": "^1.10.1",
-    "nodemailer": "^8.0.5",
+    "resend": "^4.2.0",
     "zod": "^4.3.6"
   },
   "jest": {
