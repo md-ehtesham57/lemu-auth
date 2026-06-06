@@ -42,12 +42,15 @@ export class RegisterUser {
       console.error("Failed to queue email job:", error.message);
     }
 
-    // Never return the hashed password or the verification token to the client.
     return {
       id: newUser._id,
       name: newUser.name,
       email: newUser.email,
-      isVerified: false
+      isVerified: false,
+      /// The raw OTP is returned so the UI can show it as a dev hint
+      /// when no email service is configured. Remove this in production
+      /// if you don't want the OTP exposed in the API response.
+      otp: verificationToken,
     };
   }
 }

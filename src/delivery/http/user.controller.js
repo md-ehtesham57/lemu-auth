@@ -32,7 +32,7 @@ export class UserController {
       return res.status(201).json({
         success: true,
         message: "User registered successfully. Please verify your email.",
-        data: { id: user.id, email: user.email },
+        data: { id: user.id, email: user.email, ...(user.otp ? { otp: user.otp } : {}) },
       });
     } catch (error) {
       next(error);
