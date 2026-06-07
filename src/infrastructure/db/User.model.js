@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
-  email: { type: String, required: true, unique: true, index: true }, // Index is vital for scale
+  email: { type: String, required: true, unique: true, index: true },
   password: { type: String, required: true },
   isVerified: { type: Boolean, default: false },
   verificationToken: { type: String, index: true },
@@ -18,6 +18,9 @@ const userSchema = new mongoose.Schema({
 
   loginAttempts: { type: Number, default: 0 },
   lockUntil: { type: Date, default: null },
+
+  googleId: { type: String, index: true, sparse: true },
+  picture: { type: String },
 }, { timestamps: true });
 
 // Pre-optimization: This ensures we don't re-compile the model if it exists

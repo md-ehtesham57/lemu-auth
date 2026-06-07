@@ -6,12 +6,14 @@ export class UserController {
   constructor(
     registerUserUseCase,
     loginUserUseCase,
+    loginWithGoogleUseCase,
     forgotPasswordUseCase,
     verifyEmailUseCase,
     resetPasswordUseCase
   ) {
     this.registerUserUseCase = registerUserUseCase;
     this.loginUserUseCase = loginUserUseCase;
+    this.loginWithGoogleUseCase = loginWithGoogleUseCase;
     this.forgotPasswordUseCase = forgotPasswordUseCase;
     this.verifyEmailUseCase = verifyEmailUseCase;
     this.resetPasswordUseCase = resetPasswordUseCase;
@@ -60,6 +62,42 @@ export class UserController {
             id: user.id,
             name: user.name,
             email: user.email,
+          },
+        },
+      };
+
+      if (req.isApiRequest) {
+        responseData.data.token = token;
+      }
+
+      return res.status(200).json(responseData);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  google = async (req, res, next) => {
+    try {
+      const user = await this.loginWithGoogleUseCase.execute(req.body.credential);
+
+      const token = this._generateToken(user);
+
+      res.cookie("token", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 24 * 60 * 60 * 1000,
+      });
+
+      const responseData = {
+        success: true,
+        message: "Google sign-in successful.",
+        data: {
+          user: {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            picture: user.picture,
           },
         },
       };

@@ -3,6 +3,7 @@ import { PasswordService } from "../../infrastructure/services/PasswordService.j
 import { MailService } from "../../infrastructure/services/MailService.js";
 import { RegisterUser } from "../../core/use-cases/RegisterUser.js";
 import { LoginUser } from "../../core/use-cases/LoginUser.js";
+import { LoginWithGoogle } from "../../core/use-cases/LoginWithGoogle.js";
 import { ForgotPassword } from "../../core/use-cases/ForgotPassword.js";
 import { VerifyEmail } from "../../core/use-cases/VerifyEmail.js";
 import { ResetPassword } from "../../core/use-cases/ResetPassword.js";
@@ -14,6 +15,7 @@ const mailService = new MailService();
 
 const registerUserUseCase = new RegisterUser(userRepo, passwordService);
 const loginUserUseCase = new LoginUser(userRepo, passwordService);
+const loginWithGoogleUseCase = new LoginWithGoogle(userRepo, passwordService);
 const forgotPasswordUseCase = new ForgotPassword(userRepo);
 const verifyEmailUseCase = new VerifyEmail(userRepo);
 const resetPasswordUseCase = new ResetPassword(userRepo, passwordService);
@@ -21,6 +23,7 @@ const resetPasswordUseCase = new ResetPassword(userRepo, passwordService);
 export const userController = new UserController(
   registerUserUseCase,
   loginUserUseCase,
+  loginWithGoogleUseCase,
   forgotPasswordUseCase,
   verifyEmailUseCase,
   resetPasswordUseCase

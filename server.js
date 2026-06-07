@@ -6,6 +6,7 @@ import {
   forgotPasswordSchema,
   verifyEmailSchema,
   resetPasswordSchema,
+  googleAuthSchema,
 } from "./src/infrastructure/validation/auth.schema.js";
 
 import express from "express";
@@ -97,6 +98,7 @@ app.post("/api/v1/auth/login", validate(loginSchema), userController.login);
 app.post("/api/v1/auth/forgot-password", validate(forgotPasswordSchema), userController.forgotPassword);
 app.post("/api/v1/auth/verify-email", validate(verifyEmailSchema), userController.verifyEmail);
 app.post("/api/v1/auth/reset-password", validate(resetPasswordSchema), userController.resetPassword);
+app.post("/api/v1/auth/google", validate(googleAuthSchema), userController.google);
 app.post("/api/v1/auth/logout", userController.logout);
 
 app.use(errorMiddleware);

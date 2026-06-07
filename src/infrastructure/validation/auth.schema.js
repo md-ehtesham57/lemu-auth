@@ -51,6 +51,12 @@ export const verifyEmailSchema = z.object({
   }),
 });
 
+export const googleAuthSchema = z.object({
+  body: z.object({
+    credential: z.string({ required_error: "Google credential is required" }).min(1, "Credential cannot be empty"),
+  }),
+});
+
 export const resetPasswordSchema = z.object({
   body: z.object({
     token: z
